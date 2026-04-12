@@ -31,10 +31,23 @@ npm install
 ```
 
 ### 3. Running the Application
-Start the application using PM2:
 
+**For Development:**
 ```bash
-pm2 start "npm run dev" --name "auracms"
+npm run dev
+```
+
+**For Production:**
+Build the frontend and start the production server:
+```bash
+npm run build
+npm run start:prod
+```
+
+Or using PM2 for production:
+```bash
+npm run build
+pm2 start "npm run start:prod" --name "auracms"
 ```
 
 ### 4. Nginx Configuration
@@ -60,14 +73,6 @@ location / {
         expires off;
     }
 ```
-
-## 🔐 Security Configuration
-
-By default, the application comes with the following credentials:
-- **Admin Panel Password**: `1212`
-- **Links & Files Section Password**: `2323`
-
-It is highly recommended that you change these passwords before deploying your application. You can update them by searching for these values in the `server.ts` file and replacing them with your desired passwords.
 
 ## 📂 Project Structure
 
