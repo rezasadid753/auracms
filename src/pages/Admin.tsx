@@ -89,6 +89,20 @@ export default function Admin() {
         language_mode: data.language_mode || 'en',
         timezone: data.timezone || 'UTC'
       });
+      if (data.identity_name) {
+        document.title = data.identity_name;
+      }
+      if (data.identity_image) {
+        const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+        if (link) {
+          link.href = data.identity_image;
+        } else {
+          const newLink = document.createElement('link');
+          newLink.rel = 'icon';
+          newLink.href = data.identity_image;
+          document.head.appendChild(newLink);
+        }
+      }
     });
   }, []);
 
@@ -601,7 +615,7 @@ export default function Admin() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0 p-1.5 border border-zinc-800 rounded-xl bg-zinc-900/30">
-                        <button onClick={() => copyToClipboard(`${window.location.origin}/api/download/${file.filename}`, `direct-${file.id}`)} className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors flex items-center gap-2">
+                        <button onClick={() => copyToClipboard(`${window.location.origin}/api/download/${encodeURIComponent(file.filename)}`, `direct-${file.id}`)} className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors flex items-center gap-2">
                           {copiedId === `direct-${file.id}` ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />} Direct Link
                         </button>
                         <button onClick={() => handleDeleteFile(file.id)} className="p-1.5 text-zinc-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
@@ -609,9 +623,9 @@ export default function Admin() {
                     </div>
 
                     <div className="pl-12 space-y-2">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
                         {selectedFileId === file.id ? (
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <input type="text" placeholder={isFa ? 'رمز عبور (اختیاری)' : 'Password (opt)'} value={sharePassword} onChange={e => setSharePassword(e.target.value)} className={`px-3 py-1.5 rounded-lg bg-zinc-950 border border-zinc-700 text-xs text-zinc-200 focus:outline-none w-32 ${inputFontClass}`} />
                             <button onClick={() => handleGenerateShareLink(file.id)} className="px-3 py-1.5 rounded-lg bg-zinc-100 text-zinc-950 hover:bg-white text-xs font-medium transition-colors">{isFa ? 'ایجاد' : 'Create'}</button>
                             <button onClick={() => setSelectedFileId(null)} className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors">{isFa ? 'لغو' : 'Cancel'}</button>
@@ -623,13 +637,13 @@ export default function Admin() {
 
                       {file.shares.map((share: any) => (
                         <div key={share.share_id} className="flex flex-col gap-2 p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                            <div className="flex flex-wrap items-center gap-3">
                               <span className="font-mono text-zinc-400">{share.share_id}</span>
                               {share.password && <span className="flex items-center gap-1 text-zinc-500" title={`Password: ${share.password}`}><Lock className="w-3 h-3"/> Protected ({share.password})</span>}
                               <span className="text-zinc-500">Clicks: {share.clicks}</span>
                             </div>
-                            <div className="flex items-center gap-2 p-1 border border-zinc-800 rounded-xl bg-zinc-900/30">
+                            <div className="flex flex-wrap items-center gap-2 p-1 border border-zinc-800 rounded-xl bg-zinc-900/30 self-start sm:self-auto">
                               <button onClick={() => handleViewClicks(share.share_id)} className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors">Logs</button>
                               <button onClick={() => handleResetShareClicks(share.share_id)} className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors">Reset</button>
                               <button onClick={() => copyToClipboard(`${window.location.origin}/share/${share.share_id}`, share.share_id)} className="px-2 py-1 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors flex items-center gap-1">
@@ -729,7 +743,7 @@ export default function Admin() {
                             <p className="text-xs text-zinc-500">{formatSize(msg.size)}</p>
                           </div>
                         </div>
-                        <a href={`/api/download/${msg.filename}`} download className="px-3 py-2 sm:py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors flex items-center justify-center gap-2 shrink-0 w-full sm:w-auto">
+                        <a href={`/api/download/${encodeURIComponent(msg.filename)}`} download className="px-3 py-2 sm:py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-300 transition-colors flex items-center justify-center gap-2 shrink-0 w-full sm:w-auto">
                           <Download className="w-3.5 h-3.5" /> Download
                         </a>
                       </div>
