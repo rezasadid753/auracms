@@ -40,13 +40,25 @@ export default function Home() {
     fetch('/api/sections', { cache: 'no-store' }).then(res => res.json()).then(setSections);
     fetch('/api/public-uploads', { cache: 'no-store' }).then(res => res.json()).then(setPublicUploads);
     fetch('/api/settings', { cache: 'no-store' }).then(res => res.json()).then(data => {
-      if (data.identity_name) setIdentity({ 
-        name: data.identity_name, 
-        name_fa: data.identity_name_fa || 'نام شما',
-        profession: data.identity_profession, 
-        profession_fa: data.identity_profession_fa || 'حرفه شما',
-        image: data.identity_image 
-      });
+      if (data.identity_name) {
+        setIdentity(prev => ({ ...prev, name: data.identity_name }));
+        document.title = data.identity_name;
+      }
+      if (data.identity_name_fa) setIdentity(prev => ({ ...prev, name_fa: data.identity_name_fa }));
+      if (data.identity_profession) setIdentity(prev => ({ ...prev, profession: data.identity_profession }));
+      if (data.identity_profession_fa) setIdentity(prev => ({ ...prev, profession_fa: data.identity_profession_fa }));
+      if (data.identity_image) {
+        setIdentity(prev => ({ ...prev, image: data.identity_image }));
+        const link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
+        if (link) {
+          link.href = data.identity_image;
+        } else {
+          const newLink = document.createElement('link');
+          newLink.rel = 'icon';
+          newLink.href = data.identity_image;
+          document.head.appendChild(newLink);
+        }
+      }
       if (data.language_mode) {
         setLanguageMode(data.language_mode);
         setCurrentLanguage(data.language_mode === 'fa' ? 'fa' : 'en');
@@ -424,7 +436,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="pt-8 border-t border-zinc-900 text-center text-zinc-600 text-xs">
-          <p>© {new Date().getFullYear()} {currentLanguage === 'fa' ? 'رضا سدید' : identity.name}. {currentLanguage === 'fa' ? 'تمامی حقوق محفوظ است.' : 'All rights reserved.'}</p>
+          <p>© {new Date().getFullYear()} {currentLanguage === 'fa' ? identity.name_fa : identity.name}. {currentLanguage === 'fa' ? 'تمامی حقوق محفوظ است.' : 'All rights reserved.'}</p>
         </footer>
       </div>
     </div>
